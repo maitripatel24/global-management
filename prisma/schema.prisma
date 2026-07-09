@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+  REVIEWED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(EMPLOYEE)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  tasksAssigned   Task[]         @relation("TasksAssignedToMe")
+  tasksCreated    Task[]         @relation("TasksICreated")
+  dailyUpdates    DailyUpdate[]
+  notifications   Notification[]
+}
+
+model Task {
+  id           String       @id @default(cuid())
+  title        String
+  description  String
+  priority     TaskPriority @default(MEDIUM)
+  status       TaskStatus   @default(PENDING)
+  dueDate      DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  assignedTo   User   @relation("TasksAssignedToMe", fields: [assignedToId], references: [id])
+  assignedToId String
+  assignedBy   User   @relation("TasksICreated", fields: [assignedById], references: [id])
+  assignedById String
+
+  reviewComment String?
+  reviewedAt    DateTime?
+  rating        Int?
+
+  workLogEntries WorkLogEntry[]
+}
+
+model DailyUpdate {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  date      DateTime
+  summary   String
+  createdAt DateTime @default(now())
+
+  hourlyEntries WorkLogEntry[]
+
+  @@unique([userId, date])
+}
+
+model WorkLogEntry {
+  id            String      @id @default(cuid())
+  dailyUpdate   DailyUpdate @relation(fields: [dailyUpdateId], references: [id], onDelete: Cascade)
+  dailyUpdateId String
+  task          Task?       @relation(fields: [taskId], references: [id])
+  taskId        String?
+  hour          Int
+  hoursSpent    Float
+  note          String?
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
