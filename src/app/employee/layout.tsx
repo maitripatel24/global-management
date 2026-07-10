@@ -21,6 +21,7 @@ export default async function EmployeeLayout({ children }: { children: React.Rea
           { href: "/employee", label: "Dashboard" },
           { href: "/employee/tasks", label: "My Tasks" },
           { href: "/employee/daily-update", label: "Daily Update" },
+          { href: "/employee/guide", label: "Guide" },
         ]}
       />
       <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { StatCard } from "@/components/StatCard";
+import { IconUsers, IconTasks, IconCheckCircle, IconInbox, IconArrowRight } from "@/components/icons";
 
 function todayStart() {
   const d = new Date();
@@ -9,7 +11,7 @@ function todayStart() {
 }
 
 export default async function AdminDashboard() {
-  await requireUser("ADMIN");
+  const user = await requireUser("ADMIN");
   const date = todayStart();
 
   const [employees, tasks, todaysUpdates, recentUpdates] = await Promise.all([
@@ -32,15 +34,25 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-slate-900">Admin Dashboard</h1>
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900">Welcome back, {user.name}</h1>
+        <p className="text-sm text-slate-500">Here&apos;s how the team is doing today.</p>
+      </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard label="Employees" value={employees.length} />
-        <StatCard label="Open tasks" value={statusCounts.PENDING + statusCounts.IN_PROGRESS} />
-        <StatCard label="Awaiting review" value={statusCounts.DONE} />
+        <StatCard label="Employees" value={employees.length} icon={<IconUsers />} color="purple" />
+        <StatCard
+          label="Open tasks"
+          value={statusCounts.PENDING + statusCounts.IN_PROGRESS}
+          icon={<IconTasks />}
+          color="blue"
+        />
+        <StatCard label="Awaiting review" value={statusCounts.DONE} icon={<IconCheckCircle />} color="amber" />
         <StatCard
           label="Updates submitted today"
           value={`${todaysUpdates}/${employees.length}`}
+          icon={<IconInbox />}
+          color="green"
         />
       </div>
 
@@ -48,8 +60,8 @@ export default async function AdminDashboard() {
         <div className="rounded-lg border border-slate-200 bg-white">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <h2 className="text-sm font-semibold text-slate-800">Tasks awaiting your review</h2>
-            <Link href="/admin/tasks" className="text-xs text-slate-500 underline">
-              View all
+            <Link href="/admin/tasks" className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800">
+              View all <IconArrowRight className="h-3 w-3" />
             </Link>
           </div>
           <ul className="divide-y divide-slate-100">
@@ -57,14 +69,17 @@ export default async function AdminDashboard() {
               .filter((t) => t.status === "DONE")
               .slice(0, 5)
               .map((t) => (
-                <li key={t.id} className="px-4 py-3">
+                <li key={t.id} className="px-4 py-3 transition-colors hover:bg-slate-50">
                   <Link href={`/admin/tasks/${t.id}`} className="text-sm font-medium text-slate-800 hover:underline">
                     {t.title}
                   </Link>
                 </li>
               ))}
             {statusCounts.DONE === 0 && (
-              <li className="px-4 py-6 text-center text-sm text-slate-400">Nothing awaiting review.</li>
+              <li className="flex flex-col items-center gap-2 px-4 py-8 text-center text-sm text-slate-400">
+                <IconCheckCircle className="h-6 w-6 text-slate-300" />
+                Nothing awaiting review.
+              </li>
             )}
           </ul>
         </div>
@@ -72,13 +87,13 @@ export default async function AdminDashboard() {
         <div className="rounded-lg border border-slate-200 bg-white">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <h2 className="text-sm font-semibold text-slate-800">Recent daily updates</h2>
-            <Link href="/admin/employees" className="text-xs text-slate-500 underline">
-              View employees
+            <Link href="/admin/employees" className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800">
+              View employees <IconArrowRight className="h-3 w-3" />
             </Link>
           </div>
           <ul className="divide-y divide-slate-100">
             {recentUpdates.map((u) => (
-              <li key={u.id} className="px-4 py-3">
+              <li key={u.id} className="px-4 py-3 transition-colors hover:bg-slate-50">
                 <Link href={`/admin/employees/${u.userId}`} className="text-sm font-medium text-slate-800 hover:underline">
                   {u.user.name}
                 </Link>
@@ -86,20 +101,14 @@ export default async function AdminDashboard() {
               </li>
             ))}
             {recentUpdates.length === 0 && (
-              <li className="px-4 py-6 text-center text-sm text-slate-400">No updates yet.</li>
+              <li className="flex flex-col items-center gap-2 px-4 py-8 text-center text-sm text-slate-400">
+                <IconInbox className="h-6 w-6 text-slate-300" />
+                No updates yet.
+              </li>
             )}
           </ul>
         </div>
       </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-900">{value}</p>
     </div>
   );
 }

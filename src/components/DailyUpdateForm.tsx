@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { submitDailyUpdate, type DailyUpdateEntryInput } from "@/app/actions/dailyUpdates";
+import { useToast } from "@/components/Toast";
+import { IconPlus } from "@/components/icons";
 
 type TaskOption = { id: string; title: string };
 
@@ -22,6 +24,12 @@ export function DailyUpdateForm({
   const [entries, setEntries] = useState<DailyUpdateEntryInput[]>(
     initialEntries.length > 0 ? initialEntries : [{ hour: 9, taskId: null, hoursSpent: 1, note: "" }],
   );
+  const showToast = useToast();
+
+  useEffect(() => {
+    if (state?.success) showToast("success", "Daily update saved.");
+    else if (state?.error) showToast("error", state.error);
+  }, [state, showToast]);
 
   function updateEntry(index: number, patch: Partial<DailyUpdateEntryInput>) {
     setEntries((prev) => prev.map((e, i) => (i === index ? { ...e, ...patch } : e)));
@@ -47,7 +55,7 @@ export function DailyUpdateForm({
           required
           defaultValue={initialSummary}
           rows={4}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-slate-500 focus:outline-none"
           placeholder="e.g. Finished the sales report, fixed the invoice bug, onboarded new client contacts..."
         />
       </div>
@@ -55,14 +63,22 @@ export function DailyUpdateForm({
       <div>
         <div className="flex items-center justify-between">
           <label className="block text-sm font-medium text-slate-700">Hourly breakdown (optional)</label>
-          <button type="button" onClick={addEntry} className="text-xs font-medium text-slate-700 underline">
-            + Add hour
+          <button
+            type="button"
+            onClick={addEntry}
+            className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 transition-colors hover:text-slate-950"
+          >
+            <IconPlus className="h-3.5 w-3.5" />
+            Add hour
           </button>
         </div>
 
         <div className="mt-2 space-y-2">
           {entries.map((entry, i) => (
-            <div key={i} className="flex flex-wrap items-center gap-2 rounded-md border border-slate-200 p-2">
+            <div
+              key={i}
+              className="animate-fade-in-up flex flex-wrap items-center gap-2 rounded-md border border-slate-200 p-2 transition-colors hover:border-slate-300"
+            >
               <select
                 value={entry.hour}
                 onChange={(e) => updateEntry(i, { hour: Number(e.target.value) })}
@@ -119,13 +135,10 @@ export function DailyUpdateForm({
         </div>
       </div>
 
-      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
-      {state?.success && <p className="text-sm text-green-600">Daily update saved.</p>}
-
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-slate-700 hover:shadow-md active:scale-[0.98] disabled:opacity-50"
       >
         {isPending ? "Saving..." : "Submit daily update"}
       </button>

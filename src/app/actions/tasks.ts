@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { notifyUser, notifyAdmins } from "@/lib/notify";
 
-export type TaskFormState = { error?: string } | undefined;
+export type TaskFormState = { error?: string; success?: boolean } | undefined;
 
 export async function createTask(_prevState: TaskFormState, formData: FormData) {
   const admin = await requireUser("ADMIN");
@@ -35,6 +35,8 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
 
   revalidatePath("/admin/tasks");
   revalidatePath("/employee");
+
+  return { success: true };
 }
 
 export async function updateTaskStatus(taskId: string, status: "IN_PROGRESS" | "DONE") {

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { StatCard } from "@/components/StatCard";
+import { IconTasks, IconCheckCircle, IconInbox, IconClock } from "@/components/icons";
 
 function todayStart() {
   const d = new Date();
@@ -39,22 +41,29 @@ export default async function EmployeeDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-xs text-slate-500">Open tasks</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{openTasks.length}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-xs text-slate-500">Completed tasks</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{doneCount}</p>
-        </div>
-        <div className={`rounded-lg border p-4 ${todaysUpdate ? "border-green-200 bg-green-50" : "border-amber-200 bg-amber-50"}`}>
-          <p className="text-xs text-slate-500">Today&apos;s update</p>
-          <p className="mt-1 text-sm font-medium text-slate-800">
-            {todaysUpdate ? "Submitted" : "Not submitted yet"}
-          </p>
-          <Link href="/employee/daily-update" className="mt-2 inline-block text-xs font-medium text-slate-900 underline">
-            {todaysUpdate ? "Edit update" : "Submit now"}
-          </Link>
+        <StatCard label="Open tasks" value={openTasks.length} icon={<IconTasks />} color="blue" />
+        <StatCard label="Completed tasks" value={doneCount} icon={<IconCheckCircle />} color="green" />
+        <div
+          className={`group flex items-center gap-3 rounded-lg border p-4 transition-all hover:-translate-y-0.5 hover:shadow-md ${
+            todaysUpdate ? "border-green-200 bg-green-50" : "border-amber-200 bg-amber-50"
+          }`}
+        >
+          <span
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+              todaysUpdate ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+            }`}
+          >
+            {todaysUpdate ? <IconCheckCircle /> : <IconClock />}
+          </span>
+          <div>
+            <p className="text-xs text-slate-500">Today&apos;s update</p>
+            <p className="mt-0.5 text-sm font-semibold text-slate-900">
+              {todaysUpdate ? "Submitted" : "Not submitted yet"}
+            </p>
+            <Link href="/employee/daily-update" className="text-xs font-medium text-slate-700 underline">
+              {todaysUpdate ? "Edit update" : "Submit now"}
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -64,10 +73,13 @@ export default async function EmployeeDashboard() {
         </div>
         <ul className="divide-y divide-slate-100">
           {tasks.length === 0 && (
-            <li className="px-4 py-6 text-center text-sm text-slate-400">No tasks assigned yet.</li>
+            <li className="flex flex-col items-center gap-2 px-4 py-8 text-center text-sm text-slate-400">
+              <IconInbox className="h-6 w-6 text-slate-300" />
+              No tasks assigned yet.
+            </li>
           )}
           {tasks.map((task) => (
-            <li key={task.id} className="flex items-center justify-between px-4 py-3">
+            <li key={task.id} className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-slate-50">
               <Link href={`/employee/tasks/${task.id}`} className="text-sm font-medium text-slate-800 hover:underline">
                 {task.title}
               </Link>
