@@ -75,6 +75,16 @@ export function CreateTaskForm({ employees }: { employees: EmployeeOption[] }) {
           className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-slate-500 focus:outline-none"
         />
       </div>
+      <div className="sm:col-span-2">
+        <label className="block text-xs font-medium text-slate-700">Attachments (optional)</label>
+        <input
+          type="file"
+          name="attachments"
+          multiple
+          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 transition-colors file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-slate-700 hover:file:bg-slate-200"
+        />
+        <p className="mt-1 text-xs text-slate-400">Up to 5 files, 5MB each.</p>
+      </div>
 
       <div className="sm:col-span-2">
         <button

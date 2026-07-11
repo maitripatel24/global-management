@@ -38,6 +38,8 @@ model User {
   tasksCreated    Task[]         @relation("TasksICreated")
   dailyUpdates    DailyUpdate[]
   notifications   Notification[]
+  messageThread   Message[]      @relation("EmployeeThread")
+  messagesSent    Message[]      @relation("MessagesSent")
 }
 
 model Task {
@@ -60,6 +62,31 @@ model Task {
   rating        Int?
 
   workLogEntries WorkLogEntry[]
+  attachments    TaskAttachment[]
+}
+
+model TaskAttachment {
+  id         String   @id @default(cuid())
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId     String
+  fileName   String
+  mimeType   String
+  size       Int
+  data       Bytes
+  uploadedAt DateTime @default(now())
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  employee   User     @relation("EmployeeThread", fields: [employeeId], references: [id])
+  employeeId String
+  sender     User     @relation("MessagesSent", fields: [senderId], references: [id])
+  senderId   String
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([employeeId, createdAt])
 }
 
 model DailyUpdate {

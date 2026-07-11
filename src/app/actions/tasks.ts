@@ -7,6 +7,9 @@ import { notifyUser, notifyAdmins } from "@/lib/notify";
 
 export type TaskFormState = { error?: string; success?: boolean } | undefined;
 
+const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024; // 5MB per file
+const MAX_ATTACHMENTS = 5;
+
 export async function createTask(_prevState: TaskFormState, formData: FormData) {
   const admin = await requireUser("ADMIN");
 
@@ -15,9 +18,17 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
   const assignedToId = formData.get("assignedToId") as string;
   const priority = formData.get("priority") as "LOW" | "MEDIUM" | "HIGH";
   const dueDateRaw = formData.get("dueDate") as string;
+  const files = formData.getAll("attachments").filter((f): f is File => f instanceof File && f.size > 0);
 
   if (!title || !description || !assignedToId) {
     return { error: "Title, description and assignee are required." };
+  }
+  if (files.length > MAX_ATTACHMENTS) {
+    return { error: `You can attach at most ${MAX_ATTACHMENTS} files.` };
+  }
+  const tooBig = files.find((f) => f.size > MAX_ATTACHMENT_SIZE);
+  if (tooBig) {
+    return { error: `"${tooBig.name}" is too large. Max size is 5MB per file.` };
   }
 
   const task = await prisma.task.create({
@@ -30,6 +41,20 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
       dueDate: dueDateRaw ? new Date(dueDateRaw) : null,
     },
   });
+
+  if (files.length > 0) {
+    await prisma.taskAttachment.createMany({
+      data: await Promise.all(
+        files.map(async (file) => ({
+          taskId: task.id,
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          size: file.size,
+          data: Buffer.from(await file.arrayBuffer()),
+        })),
+      ),
+    });
+  }
 
   await notifyUser(assignedToId, `New task assigned: "${title}"`, `/employee/tasks/${task.id}`);
 

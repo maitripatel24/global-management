@@ -9,12 +9,14 @@ import {
   IconChart,
   IconGuide,
   IconInbox,
+  IconChat,
 } from "@/components/icons";
 
 const iconFor = (label: string) => {
   const key = label.toLowerCase();
   if (key.includes("dashboard")) return IconDashboard;
   if (key.includes("employee") || key.includes("user")) return IconUsers;
+  if (key.includes("chat")) return IconChat;
   if (key.includes("task")) return IconTasks;
   if (key.includes("analytic")) return IconChart;
   if (key.includes("guide")) return IconGuide;

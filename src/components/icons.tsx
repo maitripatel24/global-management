@@ -121,6 +121,30 @@ export function IconInbox({ className = base }: IconProps) {
   );
 }
 
+export function IconPaperclip({ className = base }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
+      <path
+        d="M21 11.5L12.5 20a4.5 4.5 0 01-6.36-6.36l8.49-8.49a3 3 0 014.24 4.24l-8.49 8.49a1.5 1.5 0 01-2.12-2.12l7.78-7.78"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IconChat({ className = base }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
+      <path
+        d="M4 5.5A2.5 2.5 0 016.5 3h11A2.5 2.5 0 0120 5.5v8A2.5 2.5 0 0117.5 16H9l-4 4v-4H6.5A2.5 2.5 0 014 13.5v-8z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function IconSparkle({ className = base }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className}>

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { TaskStatusActions } from "@/components/TaskStatusActions";
+import { AttachmentsList } from "@/components/AttachmentsList";
 
 const statusStyles: Record<string, string> = {
   PENDING: "bg-slate-100 text-slate-700",
@@ -20,7 +21,7 @@ export default async function EmployeeTaskDetailPage({
 
   const task = await prisma.task.findUnique({
     where: { id },
-    include: { assignedBy: true },
+    include: { assignedBy: true, attachments: { select: { id: true, fileName: true, size: true, mimeType: true } } },
   });
 
   if (!task || task.assignedToId !== user.id) {
@@ -46,6 +47,8 @@ export default async function EmployeeTaskDetailPage({
           {task.dueDate && <span>Due {new Date(task.dueDate).toLocaleDateString()}</span>}
         </div>
       </div>
+
+      <AttachmentsList attachments={task.attachments} />
 
       <TaskStatusActions taskId={task.id} status={task.status} />
 

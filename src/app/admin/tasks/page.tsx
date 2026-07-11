@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { CreateTaskForm } from "@/components/CreateTaskForm";
+import { IconPaperclip } from "@/components/icons";
 
 const statusStyles: Record<string, string> = {
   PENDING: "bg-slate-100 text-slate-700",
@@ -16,7 +17,7 @@ export default async function AdminTasksPage() {
   const [tasks, employees] = await Promise.all([
     prisma.task.findMany({
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-      include: { assignedTo: true },
+      include: { assignedTo: true, _count: { select: { attachments: true } } },
     }),
     prisma.user.findMany({ where: { role: "EMPLOYEE", active: true }, select: { id: true, name: true } }),
   ]);
@@ -44,8 +45,17 @@ export default async function AdminTasksPage() {
             {tasks.map((task) => (
               <tr key={task.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3">
-                  <Link href={`/admin/tasks/${task.id}`} className="font-medium text-slate-800 hover:underline">
+                  <Link
+                    href={`/admin/tasks/${task.id}`}
+                    className="inline-flex items-center gap-1.5 font-medium text-slate-800 hover:underline"
+                  >
                     {task.title}
+                    {task._count.attachments > 0 && (
+                      <span className="inline-flex items-center gap-0.5 text-xs font-normal text-slate-400">
+                        <IconPaperclip className="h-3 w-3" />
+                        {task._count.attachments}
+                      </span>
+                    )}
                   </Link>
                 </td>
                 <td className="px-4 py-3 text-slate-600">{task.assignedTo.name}</td>

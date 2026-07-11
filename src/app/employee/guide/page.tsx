@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/session";
 import { GuideSection, GuideStep, GuideTip } from "@/components/GuideSection";
-import { IconTasks, IconInbox, IconBell, IconSparkle } from "@/components/icons";
+import { IconTasks, IconInbox, IconBell, IconSparkle, IconChat } from "@/components/icons";
 
 export default async function EmployeeGuidePage() {
   await requireUser("EMPLOYEE");
@@ -15,7 +15,7 @@ export default async function EmployeeGuidePage() {
 
       <GuideSection icon={<IconTasks className="h-4.5 w-4.5" />} title="1. Your tasks" color="blue" index={0}>
         <GuideStep n={1}>Your <strong>Dashboard</strong> and <strong>My Tasks</strong> page show everything assigned to you.</GuideStep>
-        <GuideStep n={2}>Open a task to see the full description, priority, and due date.</GuideStep>
+        <GuideStep n={2}>Open a task to see the full description, priority, due date, and any files your admin attached.</GuideStep>
         <GuideStep n={3}>Click <strong>Start task</strong> when you begin, and <strong>Mark as done</strong> when finished &mdash; this notifies your admin automatically.</GuideStep>
         <GuideStep n={4}>Once your admin reviews it, their feedback and rating appear right on the task.</GuideStep>
       </GuideSection>
@@ -28,8 +28,12 @@ export default async function EmployeeGuidePage() {
         <GuideTip>The hourly breakdown feeds your admin&apos;s efficiency chart &mdash; filling it in helps show the real work you&apos;re putting in.</GuideTip>
       </GuideSection>
 
-      <GuideSection icon={<IconBell className="h-4.5 w-4.5" />} title="3. Notifications" color="purple" index={2}>
-        <p>The bell icon in the top bar shows a red badge when you have something new &mdash; a task assignment or review feedback from your admin. Click it to see the full list, and click any notification to jump straight to what it&apos;s about.</p>
+      <GuideSection icon={<IconChat className="h-4.5 w-4.5" />} title="3. Chat with your admin" color="amber" index={2}>
+        <p>Go to <strong>Chat</strong> to message management directly &mdash; it updates live, no need to refresh the page.</p>
+      </GuideSection>
+
+      <GuideSection icon={<IconBell className="h-4.5 w-4.5" />} title="4. Notifications" color="purple" index={3}>
+        <p>The bell icon in the top bar shows a red badge when you have something new &mdash; a task assignment, review feedback, or a chat message from your admin. Click it to see the full list, and click any notification to jump straight to what it&apos;s about.</p>
       </GuideSection>
     </div>
   );

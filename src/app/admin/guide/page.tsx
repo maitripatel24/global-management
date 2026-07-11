@@ -8,6 +8,7 @@ import {
   IconChart,
   IconBell,
   IconSparkle,
+  IconChat,
 } from "@/components/icons";
 
 export default async function AdminGuidePage() {
@@ -38,7 +39,11 @@ export default async function AdminGuidePage() {
       <GuideSection icon={<IconTasks className="h-4.5 w-4.5" />} title="2. Assign tasks" color="blue" index={1}>
         <GuideStep n={1}>Go to <strong>Tasks</strong> and fill in the &quot;Assign a new task&quot; form.</GuideStep>
         <GuideStep n={2}>Set a title, description, who it&apos;s for, priority, and an optional due date.</GuideStep>
-        <GuideStep n={3}>The employee gets an instant in-app notification and sees it on their dashboard.</GuideStep>
+        <GuideStep n={3}>
+          Optionally attach up to 5 files (max 5MB each) &mdash; useful for reference documents, spreadsheets, or
+          screenshots the employee will need.
+        </GuideStep>
+        <GuideStep n={4}>The employee gets an instant in-app notification and sees it on their dashboard.</GuideStep>
         <GuideTip>Tasks move through four stages automatically: Pending → In Progress → Done → Reviewed.</GuideTip>
       </GuideSection>
 
@@ -61,8 +66,14 @@ export default async function AdminGuidePage() {
         <GuideTip>This chart is empty until employees start filling in the optional &quot;hourly breakdown&quot; on their daily updates &mdash; encourage them to use it.</GuideTip>
       </GuideSection>
 
-      <GuideSection icon={<IconBell className="h-4.5 w-4.5" />} title="Notifications" color="purple" index={5}>
-        <p>The bell icon in the top bar lights up whenever an employee submits a daily update or marks a task done. Click a notification to jump straight to it, or &quot;Mark all read&quot; to clear the count.</p>
+      <GuideSection icon={<IconChat className="h-4.5 w-4.5" />} title="6. Chat with employees" color="green" index={5}>
+        <GuideStep n={1}>Go to <strong>Chats</strong> to see every employee and their most recent message.</GuideStep>
+        <GuideStep n={2}>Click an employee to open your conversation with them and send a message &mdash; it updates live, no refresh needed.</GuideStep>
+        <GuideTip>Every admin sees the same conversation with a given employee, so anyone on your team can jump in.</GuideTip>
+      </GuideSection>
+
+      <GuideSection icon={<IconBell className="h-4.5 w-4.5" />} title="Notifications" color="purple" index={6}>
+        <p>The bell icon in the top bar lights up whenever an employee submits a daily update, marks a task done, or sends a chat message. Click a notification to jump straight to it, or &quot;Mark all read&quot; to clear the count.</p>
       </GuideSection>
     </div>
   );
