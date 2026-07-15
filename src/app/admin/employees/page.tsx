@@ -25,6 +25,7 @@ export default async function AdminEmployeesPage() {
     <div className="space-y-4">
       <h1 className="text-xl font-semibold text-slate-900">Employees</h1>
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
             <tr>
@@ -64,6 +65,7 @@ export default async function AdminEmployeesPage() {
             })}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

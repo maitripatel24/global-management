@@ -31,8 +31,9 @@ export default async function AdminTasksPage() {
         <CreateTaskForm employees={employees} />
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white">
-        <table className="w-full text-sm">
+      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
             <tr>
               <th className="px-4 py-2">Title</th>
@@ -75,7 +76,8 @@ export default async function AdminTasksPage() {
               </tr>
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
     </div>
   );
