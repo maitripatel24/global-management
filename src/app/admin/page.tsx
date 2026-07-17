@@ -40,19 +40,27 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard label="Employees" value={employees.length} icon={<IconUsers />} color="purple" />
+        <StatCard label="Employees" value={employees.length} icon={<IconUsers />} color="purple" href="/admin/employees" />
         <StatCard
           label="Open tasks"
           value={statusCounts.PENDING + statusCounts.IN_PROGRESS}
           icon={<IconTasks />}
           color="blue"
+          href="/admin/tasks"
         />
-        <StatCard label="Awaiting review" value={statusCounts.DONE} icon={<IconCheckCircle />} color="amber" />
+        <StatCard
+          label="Awaiting review"
+          value={statusCounts.DONE}
+          icon={<IconCheckCircle />}
+          color="amber"
+          href="/admin/tasks"
+        />
         <StatCard
           label="Updates submitted today"
           value={`${todaysUpdates}/${employees.length}`}
           icon={<IconInbox />}
           color="green"
+          href="/admin/employees"
         />
       </div>
 

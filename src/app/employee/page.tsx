@@ -41,8 +41,14 @@ export default async function EmployeeDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Open tasks" value={openTasks.length} icon={<IconTasks />} color="blue" />
-        <StatCard label="Completed tasks" value={doneCount} icon={<IconCheckCircle />} color="green" />
+        <StatCard label="Open tasks" value={openTasks.length} icon={<IconTasks />} color="blue" href="/employee/tasks" />
+        <StatCard
+          label="Completed tasks"
+          value={doneCount}
+          icon={<IconCheckCircle />}
+          color="green"
+          href="/employee/tasks"
+        />
         <div
           className={`group flex items-center gap-3 rounded-lg border p-4 transition-all hover:-translate-y-0.5 hover:shadow-md ${
             todaysUpdate ? "border-green-200 bg-green-50" : "border-amber-200 bg-amber-50"
