@@ -67,12 +67,13 @@ export async function submitDailyUpdate(
 
   await notifyAdmins(
     `${employee.name} submitted their daily update for ${dateRaw}`,
-    `/admin/employees/${employee.id}`,
+    "/admin/updates",
   );
 
   revalidatePath("/employee/daily-update");
   revalidatePath("/admin/analytics");
   revalidatePath(`/admin/employees/${employee.id}`);
+  revalidatePath("/admin/updates");
 
   return { success: true };
 }
