@@ -60,7 +60,7 @@ export default async function AdminDashboard() {
           value={`${todaysUpdates}/${employees.length}`}
           icon={<IconInbox />}
           color="green"
-          href="/admin/employees"
+          href="/admin/updates"
         />
       </div>
 
