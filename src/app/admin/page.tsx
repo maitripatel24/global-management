@@ -46,14 +46,14 @@ export default async function AdminDashboard() {
           value={statusCounts.PENDING + statusCounts.IN_PROGRESS}
           icon={<IconTasks />}
           color="blue"
-          href="/admin/tasks"
+          href="/admin/tasks?filter=open"
         />
         <StatCard
           label="Awaiting review"
           value={statusCounts.DONE}
           icon={<IconCheckCircle />}
           color="amber"
-          href="/admin/tasks"
+          href="/admin/tasks?filter=review"
         />
         <StatCard
           label="Updates submitted today"
@@ -68,7 +68,10 @@ export default async function AdminDashboard() {
         <div className="rounded-lg border border-slate-200 bg-white">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <h2 className="text-sm font-semibold text-slate-800">Tasks awaiting your review</h2>
-            <Link href="/admin/tasks" className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800">
+            <Link
+              href="/admin/tasks?filter=review"
+              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800"
+            >
               View all <IconArrowRight className="h-3 w-3" />
             </Link>
           </div>
