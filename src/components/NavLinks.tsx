@@ -36,7 +36,7 @@ export function NavLinks({ links }: { links: { href: string; label: string }[] }
   const pathname = usePathname();
 
   return (
-    <nav className="hidden gap-1 sm:flex">
+    <nav className="hidden gap-1 lg:flex">
       {links.map((link) => {
         const isActive = isLinkActive(link.href, pathname);
         const Icon = iconFor(link.label);
@@ -70,7 +70,7 @@ export function MobileNav({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="sm:hidden">
+    <div className="lg:hidden">
       <button
         onClick={() => setOpen((v) => !v)}
         className="rounded-md p-2 text-slate-600 hover:bg-slate-100"
