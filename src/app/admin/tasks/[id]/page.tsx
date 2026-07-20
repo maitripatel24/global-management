@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
@@ -21,7 +22,11 @@ export default async function AdminTaskDetailPage({
 
   const task = await prisma.task.findUnique({
     where: { id },
-    include: { assignedTo: true, attachments: { select: { id: true, fileName: true, size: true, mimeType: true } } },
+    include: {
+      assignedTo: true,
+      company: true,
+      attachments: { select: { id: true, fileName: true, size: true, mimeType: true } },
+    },
   });
 
   if (!task) {
@@ -33,7 +38,17 @@ export default async function AdminTaskDetailPage({
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-xl font-semibold text-slate-900">{task.title}</h1>
-          <p className="mt-1 text-sm text-slate-500">Assigned to {task.assignedTo.name}</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Assigned to {task.assignedTo.name}
+            {task.company && (
+              <>
+                {" · "}
+                <Link href={`/admin/companies/${task.company.id}`} className="hover:underline">
+                  {task.company.name}
+                </Link>
+              </>
+            )}
+          </p>
         </div>
         <span className={`rounded-full px-2 py-1 text-xs font-medium ${statusStyles[task.status]}`}>
           {task.status.replace("_", " ")}

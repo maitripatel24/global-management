@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { IconPaperclip } from "@/components/icons";
+import { dueUrgency, dueUrgencyStyles } from "@/lib/dueDate";
 
 const statusStyles: Record<string, string> = {
   PENDING: "bg-slate-100 text-slate-700",
@@ -22,7 +23,7 @@ export default async function EmployeeTasksPage() {
   const tasks = await prisma.task.findMany({
     where: { assignedToId: user.id },
     orderBy: [{ status: "asc" }, { dueDate: "asc" }],
-    include: { _count: { select: { attachments: true } } },
+    include: { company: true, _count: { select: { attachments: true } } },
   });
 
   return (
@@ -33,31 +34,40 @@ export default async function EmployeeTasksPage() {
           {tasks.length === 0 && (
             <li className="px-4 py-6 text-center text-sm text-slate-400">No tasks assigned yet.</li>
           )}
-          {tasks.map((task) => (
-            <li key={task.id} className="px-4 py-3">
-              <div className="flex items-center justify-between">
-                <Link
-                  href={`/employee/tasks/${task.id}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-800 hover:underline"
-                >
-                  {task.title}
-                  {task._count.attachments > 0 && (
-                    <span className="inline-flex items-center gap-0.5 text-xs font-normal text-slate-400">
-                      <IconPaperclip className="h-3 w-3" />
-                      {task._count.attachments}
+          {tasks.map((task) => {
+            const urgency = dueUrgency(task.dueDate, task.status);
+            return (
+              <li key={task.id} className="px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <Link
+                    href={`/employee/tasks/${task.id}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-800 hover:underline"
+                  >
+                    {task.title}
+                    {task._count.attachments > 0 && (
+                      <span className="inline-flex items-center gap-0.5 text-xs font-normal text-slate-400">
+                        <IconPaperclip className="h-3 w-3" />
+                        {task._count.attachments}
+                      </span>
+                    )}
+                  </Link>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyles[task.status]}`}>
+                    {task.status.replace("_", " ")}
+                  </span>
+                </div>
+                <div className="mt-1 flex items-center gap-3 text-xs text-slate-500">
+                  {task.company && <span className="text-slate-600">{task.company.name}</span>}
+                  <span className={priorityStyles[task.priority]}>{task.priority} priority</span>
+                  {task.dueDate && (
+                    <span className={dueUrgencyStyles[urgency]}>
+                      Due {new Date(task.dueDate).toLocaleDateString()}
+                      {urgency === "overdue" ? " (overdue)" : urgency === "soon" ? " (soon)" : ""}
                     </span>
                   )}
-                </Link>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyles[task.status]}`}>
-                  {task.status.replace("_", " ")}
-                </span>
-              </div>
-              <div className="mt-1 flex items-center gap-3 text-xs text-slate-500">
-                <span className={priorityStyles[task.priority]}>{task.priority} priority</span>
-                {task.dueDate && <span>Due {new Date(task.dueDate).toLocaleDateString()}</span>}
-              </div>
-            </li>
-          ))}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

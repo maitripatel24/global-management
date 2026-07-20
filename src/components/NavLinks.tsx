@@ -13,12 +13,14 @@ import {
   IconChat,
   IconMenu,
   IconX,
+  IconBuilding,
 } from "@/components/icons";
 import { logout } from "@/app/actions/auth";
 
 const iconFor = (label: string) => {
   const key = label.toLowerCase();
   if (key.includes("dashboard")) return IconDashboard;
+  if (key.includes("compan")) return IconBuilding;
   if (key.includes("employee") || key.includes("user")) return IconUsers;
   if (key.includes("chat")) return IconChat;
   if (key.includes("task")) return IconTasks;

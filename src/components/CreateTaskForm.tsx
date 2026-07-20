@@ -6,8 +6,17 @@ import { useToast } from "@/components/Toast";
 import { IconPlus } from "@/components/icons";
 
 type EmployeeOption = { id: string; name: string };
+type CompanyOption = { id: string; name: string };
 
-export function CreateTaskForm({ employees }: { employees: EmployeeOption[] }) {
+export function CreateTaskForm({
+  employees,
+  companies,
+  defaultCompanyId,
+}: {
+  employees: EmployeeOption[];
+  companies?: CompanyOption[];
+  defaultCompanyId?: string;
+}) {
   const [state, formAction, isPending] = useActionState(createTask, undefined);
   const showToast = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -40,6 +49,23 @@ export function CreateTaskForm({ employees }: { employees: EmployeeOption[] }) {
           className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-slate-500 focus:outline-none"
         />
       </div>
+      {companies && (
+        <div>
+          <label className="block text-xs font-medium text-slate-700">Company</label>
+          <select
+            name="companyId"
+            defaultValue={defaultCompanyId ?? ""}
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-slate-500 focus:outline-none"
+          >
+            <option value="">No company</option>
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div>
         <label className="block text-xs font-medium text-slate-700">Assign to</label>
         <select

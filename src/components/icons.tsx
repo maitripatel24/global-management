@@ -149,6 +149,16 @@ export function IconX({ className = base }: IconProps) {
   );
 }
 
+export function IconBuilding({ className = base }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
+      <rect x="4" y="3" width="11" height="18" rx="1" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="15" y="9" width="5" height="12" rx="1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 7h1M11 7h1M7 11h1M11 11h1M7 15h1M11 15h1" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconChat({ className = base }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>

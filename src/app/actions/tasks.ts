@@ -18,6 +18,7 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
   const assignedToId = formData.get("assignedToId") as string;
   const priority = formData.get("priority") as "LOW" | "MEDIUM" | "HIGH";
   const dueDateRaw = formData.get("dueDate") as string;
+  const companyId = (formData.get("companyId") as string) || null;
   const files = formData.getAll("attachments").filter((f): f is File => f instanceof File && f.size > 0);
 
   if (!title || !description || !assignedToId) {
@@ -39,6 +40,7 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
       assignedById: admin.id,
       priority: priority || "MEDIUM",
       dueDate: dueDateRaw ? new Date(dueDateRaw) : null,
+      companyId,
     },
   });
 
@@ -60,6 +62,7 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
 
   revalidatePath("/admin/tasks");
   revalidatePath("/employee");
+  if (companyId) revalidatePath(`/admin/companies/${companyId}`);
 
   return { success: true };
 }

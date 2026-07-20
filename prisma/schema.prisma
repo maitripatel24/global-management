@@ -57,12 +57,25 @@ model Task {
   assignedBy   User   @relation("TasksICreated", fields: [assignedById], references: [id])
   assignedById String
 
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
   reviewComment String?
   reviewedAt    DateTime?
   rating        Int?
 
   workLogEntries WorkLogEntry[]
   attachments    TaskAttachment[]
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  code      String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  tasks Task[]
 }
 
 model TaskAttachment {
