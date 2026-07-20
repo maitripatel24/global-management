@@ -67,6 +67,52 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
   return { success: true };
 }
 
+export async function updateTask(_prevState: TaskFormState, formData: FormData) {
+  await requireUser("ADMIN");
+
+  const taskId = formData.get("taskId") as string;
+  const title = (formData.get("title") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim();
+  const assignedToId = formData.get("assignedToId") as string;
+  const priority = formData.get("priority") as "LOW" | "MEDIUM" | "HIGH";
+  const dueDateRaw = formData.get("dueDate") as string;
+  const companyId = (formData.get("companyId") as string) || null;
+
+  if (!taskId || !title || !description || !assignedToId) {
+    return { error: "Title, description and assignee are required." };
+  }
+
+  const existing = await prisma.task.findUnique({ where: { id: taskId } });
+  if (!existing) {
+    return { error: "Task not found." };
+  }
+
+  const task = await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      title,
+      description,
+      assignedToId,
+      priority: priority || "MEDIUM",
+      dueDate: dueDateRaw ? new Date(dueDateRaw) : null,
+      companyId,
+    },
+  });
+
+  if (assignedToId !== existing.assignedToId) {
+    await notifyUser(assignedToId, `You were assigned: "${title}"`, `/employee/tasks/${task.id}`);
+  }
+
+  revalidatePath("/admin/tasks");
+  revalidatePath(`/admin/tasks/${taskId}`);
+  revalidatePath("/employee/tasks");
+  revalidatePath(`/employee/tasks/${taskId}`);
+  if (existing.companyId) revalidatePath(`/admin/companies/${existing.companyId}`);
+  if (companyId && companyId !== existing.companyId) revalidatePath(`/admin/companies/${companyId}`);
+
+  return { success: true };
+}
+
 export async function updateTaskStatus(taskId: string, status: "IN_PROGRESS" | "DONE") {
   const employee = await requireUser("EMPLOYEE");
 

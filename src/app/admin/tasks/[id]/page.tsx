@@ -4,6 +4,8 @@ import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { ReviewTaskForm } from "@/components/ReviewTaskForm";
 import { AttachmentsList } from "@/components/AttachmentsList";
+import { EditTaskForm } from "@/components/EditTaskForm";
+import { toDateInputValue } from "@/lib/dueDate";
 
 const statusStyles: Record<string, string> = {
   PENDING: "bg-slate-100 text-slate-700",
@@ -20,14 +22,18 @@ export default async function AdminTaskDetailPage({
   const { id } = await params;
   await requireUser("ADMIN");
 
-  const task = await prisma.task.findUnique({
-    where: { id },
-    include: {
-      assignedTo: true,
-      company: true,
-      attachments: { select: { id: true, fileName: true, size: true, mimeType: true } },
-    },
-  });
+  const [task, employees, companies] = await Promise.all([
+    prisma.task.findUnique({
+      where: { id },
+      include: {
+        assignedTo: true,
+        company: true,
+        attachments: { select: { id: true, fileName: true, size: true, mimeType: true } },
+      },
+    }),
+    prisma.user.findMany({ where: { role: "EMPLOYEE", active: true }, select: { id: true, name: true } }),
+    prisma.company.findMany({ where: { active: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+  ]);
 
   if (!task) {
     notFound();
@@ -57,11 +63,25 @@ export default async function AdminTaskDetailPage({
 
       <div className="rounded-lg border border-slate-200 bg-white p-4">
         <p className="text-sm text-slate-700 whitespace-pre-wrap">{task.description}</p>
-        <div className="mt-4 flex gap-4 text-xs text-slate-500">
+        <div className="mt-4 flex items-center gap-4 text-xs text-slate-500">
           <span>Priority: {task.priority}</span>
           {task.dueDate && <span>Due {new Date(task.dueDate).toLocaleDateString()}</span>}
         </div>
       </div>
+
+      <EditTaskForm
+        task={{
+          id: task.id,
+          title: task.title,
+          description: task.description,
+          assignedToId: task.assignedToId,
+          priority: task.priority,
+          dueDate: task.dueDate ? toDateInputValue(task.dueDate) : null,
+          companyId: task.companyId,
+        }}
+        employees={employees}
+        companies={companies}
+      />
 
       <AttachmentsList attachments={task.attachments} />
 

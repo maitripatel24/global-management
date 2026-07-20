@@ -1,5 +1,15 @@
 export type DueUrgency = "overdue" | "soon" | "normal" | "none";
 
+// Formats a Date as a local YYYY-MM-DD string for <input type="date">.
+// Using toISOString() here would shift the date across a UTC day
+// boundary for any timezone not exactly at UTC+0.
+export function toDateInputValue(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 const DUE_SOON_DAYS = 3;
 
 export function dueUrgency(dueDate: Date | null, status: string): DueUrgency {
