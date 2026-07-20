@@ -56,12 +56,6 @@ export default function LoginPage() {
             {pending ? "Signing in..." : "Sign in"}
           </button>
         </form>
-
-        <div className="mt-6 rounded-md bg-slate-50 p-3 text-xs text-slate-500">
-          <p className="font-medium text-slate-600">Demo accounts</p>
-          <p>Admin: admin@office.com / Admin@123</p>
-          <p>Employee: asha@office.com / Employee@123</p>
-        </div>
       </div>
     </div>
   );
