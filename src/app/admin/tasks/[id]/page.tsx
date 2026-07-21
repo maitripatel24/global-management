@@ -46,7 +46,7 @@ export default async function AdminTaskDetailPage({
         <div>
           <h1 className="text-xl font-semibold text-slate-900">{task.title}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Assigned to {task.assignedTo.name} by {task.assignedBy.name}
+            Assigned to {task.assignedTo?.name ?? "no one yet"} by {task.assignedBy.name}
             {task.company && (
               <>
                 {" · "}

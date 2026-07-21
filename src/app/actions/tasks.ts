@@ -15,14 +15,14 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
 
   const title = (formData.get("title") as string)?.trim();
   const description = (formData.get("description") as string)?.trim();
-  const assignedToId = formData.get("assignedToId") as string;
+  const assignedToId = (formData.get("assignedToId") as string) || null;
   const priority = formData.get("priority") as "LOW" | "MEDIUM" | "HIGH";
   const dueDateRaw = formData.get("dueDate") as string;
   const companyId = (formData.get("companyId") as string) || null;
   const files = formData.getAll("attachments").filter((f): f is File => f instanceof File && f.size > 0);
 
-  if (!title || !description || !assignedToId) {
-    return { error: "Title, description and assignee are required." };
+  if (!title || !description) {
+    return { error: "Title and description are required." };
   }
   if (files.length > MAX_ATTACHMENTS) {
     return { error: `You can attach at most ${MAX_ATTACHMENTS} files.` };
@@ -58,7 +58,9 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
     });
   }
 
-  await notifyUser(assignedToId, `New task assigned: "${title}"`, `/employee/tasks/${task.id}`);
+  if (assignedToId) {
+    await notifyUser(assignedToId, `New task assigned: "${title}"`, `/employee/tasks/${task.id}`);
+  }
 
   revalidatePath("/admin/tasks");
   revalidatePath("/employee");
@@ -73,13 +75,13 @@ export async function updateTask(_prevState: TaskFormState, formData: FormData) 
   const taskId = formData.get("taskId") as string;
   const title = (formData.get("title") as string)?.trim();
   const description = (formData.get("description") as string)?.trim();
-  const assignedToId = formData.get("assignedToId") as string;
+  const assignedToId = (formData.get("assignedToId") as string) || null;
   const priority = formData.get("priority") as "LOW" | "MEDIUM" | "HIGH";
   const dueDateRaw = formData.get("dueDate") as string;
   const companyId = (formData.get("companyId") as string) || null;
 
-  if (!taskId || !title || !description || !assignedToId) {
-    return { error: "Title, description and assignee are required." };
+  if (!taskId || !title || !description) {
+    return { error: "Title and description are required." };
   }
 
   const existing = await prisma.task.findUnique({ where: { id: taskId } });
@@ -99,7 +101,7 @@ export async function updateTask(_prevState: TaskFormState, formData: FormData) 
     },
   });
 
-  if (assignedToId !== existing.assignedToId) {
+  if (assignedToId && assignedToId !== existing.assignedToId) {
     await notifyUser(assignedToId, `You were assigned: "${title}"`, `/employee/tasks/${task.id}`);
   }
 
@@ -148,7 +150,9 @@ export async function reviewTask(
     },
   });
 
-  await notifyUser(task.assignedToId, `Your task "${task.title}" has been reviewed`, `/employee/tasks/${task.id}`);
+  if (task.assignedToId) {
+    await notifyUser(task.assignedToId, `Your task "${task.title}" has been reviewed`, `/employee/tasks/${task.id}`);
+  }
 
   revalidatePath("/admin/tasks");
   revalidatePath(`/admin/tasks/${taskId}`);

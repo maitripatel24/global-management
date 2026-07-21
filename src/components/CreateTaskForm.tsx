@@ -70,10 +70,10 @@ export function CreateTaskForm({
         <label className="block text-xs font-medium text-slate-700">Assign to</label>
         <select
           name="assignedToId"
-          required
+          defaultValue=""
           className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-slate-500 focus:outline-none"
         >
-          <option value="">Select employee</option>
+          <option value="">Unassigned</option>
           {employees.map((e) => (
             <option key={e.id} value={e.id}>
               {e.name}

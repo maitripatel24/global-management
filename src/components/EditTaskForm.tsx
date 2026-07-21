@@ -16,7 +16,7 @@ export function EditTaskForm({
     id: string;
     title: string;
     description: string;
-    assignedToId: string;
+    assignedToId: string | null;
     priority: string;
     dueDate: string | null;
     companyId: string | null;
@@ -89,10 +89,10 @@ export function EditTaskForm({
         <label className="block text-xs font-medium text-slate-700">Assign to</label>
         <select
           name="assignedToId"
-          defaultValue={task.assignedToId}
-          required
+          defaultValue={task.assignedToId ?? ""}
           className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-slate-500 focus:outline-none"
         >
+          <option value="">Unassigned</option>
           {employees.map((e) => (
             <option key={e.id} value={e.id}>
               {e.name}

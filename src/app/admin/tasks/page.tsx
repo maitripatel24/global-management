@@ -143,7 +143,13 @@ export default async function AdminTasksPage({
                     </td>
                     <td className="px-4 py-3 text-slate-500">{task.company?.name ?? "—"}</td>
                     <td className="px-4 py-3 text-slate-600">
-                      {task.assignedTo.name}
+                      {task.assignedTo ? (
+                        task.assignedTo.name
+                      ) : (
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                          Unassigned
+                        </span>
+                      )}
                       <span className="block text-xs text-slate-400">by {task.assignedBy.name}</span>
                     </td>
                     <td className="px-4 py-3 text-slate-500">{task.priority}</td>
