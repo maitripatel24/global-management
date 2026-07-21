@@ -27,6 +27,7 @@ export default async function AdminTaskDetailPage({
       where: { id },
       include: {
         assignedTo: true,
+        assignedBy: true,
         company: true,
         attachments: { select: { id: true, fileName: true, size: true, mimeType: true } },
       },
@@ -45,7 +46,7 @@ export default async function AdminTaskDetailPage({
         <div>
           <h1 className="text-xl font-semibold text-slate-900">{task.title}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Assigned to {task.assignedTo.name}
+            Assigned to {task.assignedTo.name} by {task.assignedBy.name}
             {task.company && (
               <>
                 {" · "}

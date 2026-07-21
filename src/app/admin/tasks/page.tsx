@@ -33,7 +33,7 @@ export default async function AdminTasksPage({
   const [tasks, employees, companies] = await Promise.all([
     prisma.task.findMany({
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-      include: { assignedTo: true, company: true, _count: { select: { attachments: true } } },
+      include: { assignedTo: true, assignedBy: true, company: true, _count: { select: { attachments: true } } },
     }),
     prisma.user.findMany({ where: { role: "EMPLOYEE", active: true }, select: { id: true, name: true } }),
     prisma.company.findMany({ where: { active: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
@@ -142,7 +142,10 @@ export default async function AdminTasksPage({
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-slate-500">{task.company?.name ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{task.assignedTo.name}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {task.assignedTo.name}
+                      <span className="block text-xs text-slate-400">by {task.assignedBy.name}</span>
+                    </td>
                     <td className="px-4 py-3 text-slate-500">{task.priority}</td>
                     <td className={`px-4 py-3 ${dueUrgencyStyles[urgency]}`}>
                       {task.dueDate

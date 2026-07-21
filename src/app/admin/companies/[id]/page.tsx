@@ -27,7 +27,7 @@ export default async function AdminCompanyDetailPage({
       include: {
         tasks: {
           orderBy: [{ status: "asc" }, { dueDate: "asc" }],
-          include: { assignedTo: true, _count: { select: { attachments: true } } },
+          include: { assignedTo: true, assignedBy: true, _count: { select: { attachments: true } } },
         },
       },
     }),
@@ -92,7 +92,10 @@ export default async function AdminCompanyDetailPage({
                         )}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{task.assignedTo.name}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {task.assignedTo.name}
+                      <span className="block text-xs text-slate-400">by {task.assignedBy.name}</span>
+                    </td>
                     <td className={`px-4 py-3 ${dueUrgencyStyles[urgency]}`}>
                       {task.dueDate
                         ? `${task.dueDate.toLocaleDateString()}${urgency === "overdue" ? " (overdue)" : urgency === "soon" ? " (soon)" : ""}`
