@@ -2,9 +2,6 @@ import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { StatCard } from "@/components/StatCard";
-import { CreateCompanyForm } from "@/components/CreateCompanyForm";
-import { ToggleCompanyActiveButton } from "@/components/ToggleCompanyActiveButton";
-import { dueUrgency } from "@/lib/dueDate";
 import {
   IconUsers,
   IconTasks,
@@ -24,7 +21,7 @@ export default async function AdminDashboard() {
   const user = await requireUser("ADMIN");
   const date = todayStart();
 
-  const [employees, tasks, todaysUpdates, recentUpdates, companies] = await Promise.all([
+  const [employees, tasks, todaysUpdates, recentUpdates, companyCount] = await Promise.all([
     prisma.user.findMany({ where: { role: "EMPLOYEE", active: true } }),
     prisma.task.findMany(),
     prisma.dailyUpdate.count({ where: { date } }),
@@ -33,10 +30,7 @@ export default async function AdminDashboard() {
       take: 5,
       include: { user: true },
     }),
-    prisma.company.findMany({
-      orderBy: { name: "asc" },
-      include: { tasks: { select: { status: true, dueDate: true } } },
-    }),
+    prisma.company.count(),
   ]);
 
   const statusCounts = {
@@ -53,7 +47,8 @@ export default async function AdminDashboard() {
         <p className="text-sm text-slate-500">Here&apos;s how the team is doing today.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <StatCard label="Companies" value={companyCount} icon={<IconBuilding />} color="slate" href="/admin/companies" />
         <StatCard label="Employees" value={employees.length} icon={<IconUsers />} color="purple" href="/admin/employees" />
         <StatCard
           label="Open tasks"
@@ -132,65 +127,6 @@ export default async function AdminDashboard() {
               </li>
             )}
           </ul>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-slate-200 bg-white">
-        <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3">
-          <IconBuilding className="h-4 w-4 text-slate-500" />
-          <h2 className="text-sm font-semibold text-slate-800">Companies</h2>
-        </div>
-        <div className="border-b border-slate-100 p-4">
-          <CreateCompanyForm />
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
-              <tr>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Code</th>
-                <th className="px-4 py-2">Open tasks</th>
-                <th className="px-4 py-2">Overdue</th>
-                <th className="px-4 py-2">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {companies.map((c) => {
-                const open = c.tasks.filter((t) => t.status === "PENDING" || t.status === "IN_PROGRESS").length;
-                const overdue = c.tasks.filter((t) => dueUrgency(t.dueDate, t.status) === "overdue").length;
-                return (
-                  <tr key={c.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3">
-                      <Link href={`/admin/companies/${c.id}`} className="font-medium text-slate-800 hover:underline">
-                        {c.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">{c.code ?? "—"}</td>
-                    <td className="px-4 py-3">{open}</td>
-                    <td className="px-4 py-3">
-                      {overdue > 0 ? (
-                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                          {overdue} overdue
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <ToggleCompanyActiveButton companyId={c.id} active={c.active} />
-                    </td>
-                  </tr>
-                );
-              })}
-              {companies.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
-                    No companies yet. Add your first one above.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

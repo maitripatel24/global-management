@@ -19,6 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         notifications={notifications}
         links={[
           { href: "/admin", label: "Dashboard" },
+          { href: "/admin/companies", label: "Companies" },
           { href: "/admin/employees", label: "Employees" },
           { href: "/admin/tasks", label: "Tasks" },
           { href: "/admin/chats", label: "Chats" },
