@@ -25,6 +25,7 @@ export async function createCompany(_prevState: CompanyFormState, formData: Form
     data: { name, code: code || null },
   });
 
+  revalidatePath("/admin");
   revalidatePath("/admin/companies");
   return { success: true };
 }
@@ -32,5 +33,6 @@ export async function createCompany(_prevState: CompanyFormState, formData: Form
 export async function setCompanyActive(companyId: string, active: boolean) {
   await requireUser("ADMIN");
   await prisma.company.update({ where: { id: companyId }, data: { active } });
+  revalidatePath("/admin");
   revalidatePath("/admin/companies");
 }

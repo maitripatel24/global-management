@@ -62,14 +62,6 @@ export default async function AdminTaskDetailPage({
         </span>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
-        <p className="text-sm text-slate-700 whitespace-pre-wrap">{task.description}</p>
-        <div className="mt-4 flex items-center gap-4 text-xs text-slate-500">
-          <span>Priority: {task.priority}</span>
-          {task.dueDate && <span>Due {new Date(task.dueDate).toLocaleDateString()}</span>}
-        </div>
-      </div>
-
       <EditTaskForm
         task={{
           id: task.id,

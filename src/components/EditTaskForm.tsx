@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { updateTask } from "@/app/actions/tasks";
 import { useToast } from "@/components/Toast";
 
@@ -24,29 +24,16 @@ export function EditTaskForm({
   employees: EmployeeOption[];
   companies: CompanyOption[];
 }) {
-  const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(updateTask, undefined);
   const showToast = useToast();
 
   useEffect(() => {
     if (state?.success) {
       showToast("success", "Task updated.");
-      setOpen(false);
     } else if (state?.error) {
       showToast("error", state.error);
     }
   }, [state, showToast]);
-
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        className="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50"
-      >
-        Edit task
-      </button>
-    );
-  }
 
   return (
     <form action={formAction} className="grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-white p-4 sm:grid-cols-2">
@@ -121,20 +108,13 @@ export function EditTaskForm({
           className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-slate-500 focus:outline-none"
         />
       </div>
-      <div className="flex items-center gap-2 sm:col-span-2">
+      <div className="sm:col-span-2">
         <button
           type="submit"
           disabled={isPending}
           className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-slate-700 active:scale-[0.98] disabled:opacity-50"
         >
-          {isPending ? "Saving..." : "Save changes"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          className="rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
-        >
-          Cancel
+          {isPending ? "Confirming..." : "Confirm changes"}
         </button>
       </div>
     </form>
