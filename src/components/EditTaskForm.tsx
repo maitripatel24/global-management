@@ -28,9 +28,7 @@ export function EditTaskForm({
   const showToast = useToast();
 
   useEffect(() => {
-    if (state?.success) {
-      showToast("success", "Task updated.");
-    } else if (state?.error) {
+    if (state?.error) {
       showToast("error", state.error);
     }
   }, [state, showToast]);

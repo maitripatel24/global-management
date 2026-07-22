@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { notifyUser, notifyAdmins } from "@/lib/notify";
@@ -112,7 +113,7 @@ export async function updateTask(_prevState: TaskFormState, formData: FormData) 
   if (existing.companyId) revalidatePath(`/admin/companies/${existing.companyId}`);
   if (companyId && companyId !== existing.companyId) revalidatePath(`/admin/companies/${companyId}`);
 
-  return { success: true };
+  redirect(companyId ? `/admin/companies/${companyId}` : "/admin");
 }
 
 export async function updateTaskStatus(taskId: string, status: "IN_PROGRESS" | "DONE") {

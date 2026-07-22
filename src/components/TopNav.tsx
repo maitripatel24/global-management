@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { logout } from "@/app/actions/auth";
 import { NotificationBell } from "@/components/NotificationBell";
 import { NavLinks, MobileNav } from "@/components/NavLinks";
@@ -27,10 +28,13 @@ export function TopNav({
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
         <div className="flex min-w-0 items-center gap-2 sm:gap-6">
           <MobileNav links={links} userName={userName} />
-          <span className="flex min-w-0 items-center gap-1.5 truncate text-sm font-semibold text-slate-900">
+          <Link
+            href={links[0]?.href ?? "/"}
+            className="flex min-w-0 items-center gap-1.5 truncate text-sm font-semibold text-slate-900 hover:text-slate-700"
+          >
             <Logo className="h-5 w-5 shrink-0 rounded" />
             <span className="truncate">{title}</span>
-          </span>
+          </Link>
           <NavLinks links={links} />
         </div>
         <div className="flex shrink-0 items-center gap-3">
