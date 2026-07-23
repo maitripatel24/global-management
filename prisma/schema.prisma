@@ -64,6 +64,8 @@ model Task {
   reviewedAt    DateTime?
   rating        Int?
 
+  dueReminderSent Boolean @default(false)
+
   workLogEntries WorkLogEntry[]
   attachments    TaskAttachment[]
 }

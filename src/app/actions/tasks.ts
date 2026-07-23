@@ -128,6 +128,9 @@ export async function updateTask(_prevState: TaskFormState, formData: FormData) 
     return { error: "Task not found." };
   }
 
+  const newDueDate = dueDateRaw ? new Date(dueDateRaw) : null;
+  const dueDateChanged = newDueDate?.getTime() !== existing.dueDate?.getTime();
+
   const task = await prisma.task.update({
     where: { id: taskId },
     data: {
@@ -135,8 +138,9 @@ export async function updateTask(_prevState: TaskFormState, formData: FormData) 
       description,
       assignedToId,
       priority: priority || "MEDIUM",
-      dueDate: dueDateRaw ? new Date(dueDateRaw) : null,
+      dueDate: newDueDate,
       companyId,
+      ...(dueDateChanged ? { dueReminderSent: false } : {}),
     },
   });
 
