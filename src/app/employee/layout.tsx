@@ -19,6 +19,7 @@ export default async function EmployeeLayout({ children }: { children: React.Rea
         notifications={notifications}
         links={[
           { href: "/employee", label: "Dashboard" },
+          { href: "/employee/companies", label: "Companies" },
           { href: "/employee/tasks", label: "My Tasks" },
           { href: "/employee/daily-update", label: "Daily Update" },
           { href: "/employee/chat", label: "Chat" },

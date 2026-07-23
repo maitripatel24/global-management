@@ -70,6 +70,44 @@ export async function createTask(_prevState: TaskFormState, formData: FormData) 
   return { success: true };
 }
 
+export async function createSelfTask(_prevState: TaskFormState, formData: FormData) {
+  const employee = await requireUser("EMPLOYEE");
+
+  const title = (formData.get("title") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim();
+  const priority = formData.get("priority") as "LOW" | "MEDIUM" | "HIGH";
+  const dueDateRaw = formData.get("dueDate") as string;
+  const companyId = (formData.get("companyId") as string) || null;
+
+  if (!title || !description) {
+    return { error: "Title and description are required." };
+  }
+
+  const task = await prisma.task.create({
+    data: {
+      title,
+      description,
+      assignedToId: employee.id,
+      assignedById: employee.id,
+      priority: priority || "MEDIUM",
+      dueDate: dueDateRaw ? new Date(dueDateRaw) : null,
+      companyId,
+    },
+  });
+
+  await notifyAdmins(`${employee.name} created a task for themselves: "${title}"`, `/admin/tasks/${task.id}`);
+
+  revalidatePath("/admin/tasks");
+  revalidatePath("/employee");
+  revalidatePath("/employee/tasks");
+  if (companyId) {
+    revalidatePath(`/admin/companies/${companyId}`);
+    revalidatePath(`/employee/companies/${companyId}`);
+  }
+
+  return { success: true };
+}
+
 export async function updateTask(_prevState: TaskFormState, formData: FormData) {
   await requireUser("ADMIN");
 
