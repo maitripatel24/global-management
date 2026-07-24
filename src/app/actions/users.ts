@@ -12,6 +12,7 @@ export async function createUser(_prevState: CreateUserState, formData: FormData
 
   const name = (formData.get("name") as string)?.trim();
   const email = (formData.get("email") as string)?.trim().toLowerCase();
+  const phoneRaw = (formData.get("phone") as string)?.trim();
   const password = formData.get("password") as string;
   const role = formData.get("role") as "ADMIN" | "EMPLOYEE";
 
@@ -20,6 +21,9 @@ export async function createUser(_prevState: CreateUserState, formData: FormData
   }
   if (password.length < 6) {
     return { error: "Password must be at least 6 characters." };
+  }
+  if (phoneRaw && !/^\d{7,15}$/.test(phoneRaw)) {
+    return { error: "Phone number must contain only digits (7-15 digits)." };
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -31,6 +35,7 @@ export async function createUser(_prevState: CreateUserState, formData: FormData
     data: {
       name,
       email,
+      phone: phoneRaw || null,
       role,
       passwordHash: await bcrypt.hash(password, 10),
     },

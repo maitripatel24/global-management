@@ -26,6 +26,7 @@ export default async function AdminUsersPage() {
             <tr>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Phone</th>
               <th className="px-4 py-2">Role</th>
               <th className="px-4 py-2">Status</th>
             </tr>
@@ -37,6 +38,7 @@ export default async function AdminUsersPage() {
                   {u.name} {u.id === currentUser.id && <span className="text-xs text-slate-400">(you)</span>}
                 </td>
                 <td className="px-4 py-3 text-slate-500">{u.email}</td>
+                <td className="px-4 py-3 text-slate-500">{u.phone ?? "—"}</td>
                 <td className="px-4 py-3">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.role === "ADMIN" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
                     {u.role}
