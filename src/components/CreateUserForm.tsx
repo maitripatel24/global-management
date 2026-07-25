@@ -39,10 +39,11 @@ export function CreateUserForm() {
         />
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-700">Phone (optional)</label>
+        <label className="block text-xs font-medium text-slate-700">Phone</label>
         <input
           name="phone"
           type="tel"
+          required
           inputMode="numeric"
           pattern="\d{7,15}"
           maxLength={15}
