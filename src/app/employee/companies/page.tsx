@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { IconInbox } from "@/components/icons";
+import { IconInbox, IconBuilding } from "@/components/icons";
 
 export default async function EmployeeCompaniesPage() {
   const user = await requireUser("EMPLOYEE");
@@ -20,48 +20,44 @@ export default async function EmployeeCompaniesPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-slate-900">Companies</h1>
-        <p className="text-sm text-slate-500">Browse companies and your tasks for each one.</p>
+        <h1 className="text-2xl font-bold text-slate-900">Companies</h1>
+        <p className="mt-1 text-base text-slate-500">Tap a company to see your tasks for it.</p>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
-              <tr>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Code</th>
-                <th className="px-4 py-2">Your open tasks</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {companies.map((c) => {
-                const myOpen = c.tasks.filter((t) => t.status === "PENDING" || t.status === "IN_PROGRESS").length;
-                return (
-                  <tr key={c.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3">
-                      <Link href={`/employee/companies/${c.id}`} className="font-medium text-slate-800 hover:underline">
-                        {c.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">{c.code ?? "—"}</td>
-                    <td className="px-4 py-3">{myOpen}</td>
-                  </tr>
-                );
-              })}
-              {companies.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="px-4 py-8 text-center text-sm text-slate-400">
-                    <div className="flex flex-col items-center gap-2">
-                      <IconInbox className="h-6 w-6 text-slate-300" />
-                      No companies yet.
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {companies.length === 0 && (
+        <div className="flex flex-col items-center gap-2 rounded-lg border border-slate-200 bg-white py-14 text-center text-base text-slate-400">
+          <IconInbox className="h-8 w-8 text-slate-300" />
+          No companies yet.
         </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {companies.map((c) => {
+          const myOpen = c.tasks.filter((t) => t.status === "PENDING" || t.status === "IN_PROGRESS").length;
+          return (
+            <Link
+              key={c.id}
+              href={`/employee/companies/${c.id}`}
+              className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300"
+            >
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                <IconBuilding className="h-6 w-6" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-lg font-semibold text-slate-900">{c.name}</p>
+                <p className="mt-0.5 text-sm text-slate-500">
+                  {myOpen > 0 ? (
+                    <span className="font-medium text-blue-600">
+                      {myOpen} open task{myOpen === 1 ? "" : "s"} for you
+                    </span>
+                  ) : (
+                    "No open tasks for you"
+                  )}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

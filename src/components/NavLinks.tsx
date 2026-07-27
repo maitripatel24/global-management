@@ -14,6 +14,7 @@ import {
   IconMenu,
   IconX,
   IconBuilding,
+  IconLogout,
 } from "@/components/icons";
 import { logout } from "@/app/actions/auth";
 
@@ -34,11 +35,18 @@ function isLinkActive(href: string, pathname: string) {
   return href === pathname || (href !== "/admin" && href !== "/employee" && pathname.startsWith(href));
 }
 
-export function NavLinks({ links }: { links: { href: string; label: string }[] }) {
+export function NavLinks({
+  links,
+  size = "md",
+}: {
+  links: { href: string; label: string }[];
+  size?: "md" | "lg";
+}) {
   const pathname = usePathname();
+  const large = size === "lg";
 
   return (
-    <nav className="hidden gap-1 lg:flex">
+    <nav className={`hidden lg:flex ${large ? "gap-1.5" : "gap-1"}`}>
       {links.map((link) => {
         const isActive = isLinkActive(link.href, pathname);
         const Icon = iconFor(link.label);
@@ -46,13 +54,15 @@ export function NavLinks({ links }: { links: { href: string; label: string }[] }
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
+            className={`flex items-center rounded-md font-medium transition-colors ${
+              large ? "gap-2 px-3.5 py-2.5 text-base" : "gap-1.5 px-2.5 py-1.5 text-sm"
+            } ${
               isActive
                 ? "bg-slate-900 text-white"
                 : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             }`}
           >
-            <Icon className="h-3.5 w-3.5" />
+            <Icon className={large ? "h-5 w-5" : "h-3.5 w-3.5"} />
             {link.label}
           </Link>
         );
@@ -64,12 +74,15 @@ export function NavLinks({ links }: { links: { href: string; label: string }[] }
 export function MobileNav({
   links,
   userName,
+  size = "md",
 }: {
   links: { href: string; label: string }[];
   userName: string;
+  size?: "md" | "lg";
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const large = size === "lg";
 
   return (
     <div className="lg:hidden">
@@ -92,11 +105,11 @@ export function MobileNav({
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className={`flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                    isActive ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"
-                  }`}
+                  className={`flex items-center rounded-md font-medium transition-colors ${
+                    large ? "gap-3 px-4 py-3.5 text-base" : "gap-2 px-3 py-2.5 text-sm"
+                  } ${isActive ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"}`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={large ? "h-5 w-5" : "h-4 w-4"} />
                   {link.label}
                 </Link>
               );
@@ -107,8 +120,9 @@ export function MobileNav({
             <form action={logout}>
               <button
                 type="submit"
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
               >
+                <IconLogout className="h-3.5 w-3.5" />
                 Sign out
               </button>
             </form>

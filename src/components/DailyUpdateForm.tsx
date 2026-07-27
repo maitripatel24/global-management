@@ -49,20 +49,20 @@ export function DailyUpdateForm({
       <input type="hidden" name="entries" value={JSON.stringify(entries)} />
 
       <div>
-        <label className="block text-sm font-medium text-slate-700">Summary of what you did today</label>
+        <label className="block text-base font-semibold text-slate-700">What did you do today?</label>
         <textarea
           name="summary"
           required
           defaultValue={initialSummary}
           rows={4}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-slate-500 focus:outline-none"
+          className="mt-1.5 w-full rounded-md border border-slate-300 px-3 py-2.5 text-base transition-colors focus:border-slate-500 focus:outline-none"
           placeholder="e.g. Finished the sales report, fixed the invoice bug, onboarded new client contacts..."
         />
       </div>
 
       <div>
         <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-slate-700">Hourly breakdown (optional)</label>
+          <label className="block text-base font-semibold text-slate-700">Hourly breakdown (optional)</label>
           <button
             type="button"
             onClick={addEntry}
@@ -138,7 +138,7 @@ export function DailyUpdateForm({
       <button
         type="submit"
         disabled={isPending}
-        className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-slate-700 hover:shadow-md active:scale-[0.98] disabled:opacity-50"
+        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-slate-700 hover:shadow-md active:scale-[0.98] disabled:opacity-50"
       >
         {isPending ? "Saving..." : "Submit daily update"}
       </button>

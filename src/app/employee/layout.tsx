@@ -17,6 +17,7 @@ export default async function EmployeeLayout({ children }: { children: React.Rea
         title="Office Manager"
         userName={user.name ?? ""}
         notifications={notifications}
+        size="lg"
         links={[
           { href: "/employee", label: "Dashboard" },
           { href: "/employee/companies", label: "Companies" },

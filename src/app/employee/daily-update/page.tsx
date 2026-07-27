@@ -30,8 +30,8 @@ export default async function DailyUpdatePage() {
   return (
     <div className="max-w-2xl space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-slate-900">Daily Update</h1>
-        <p className="text-sm text-slate-500">{date.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
+        <h1 className="text-2xl font-bold text-slate-900">Daily Update</h1>
+        <p className="mt-1 text-base text-slate-500">{date.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
       </div>
 
       <div className="rounded-lg border border-slate-200 bg-white p-6">
