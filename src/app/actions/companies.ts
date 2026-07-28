@@ -36,3 +36,17 @@ export async function setCompanyActive(companyId: string, active: boolean) {
   revalidatePath("/admin");
   revalidatePath("/admin/companies");
 }
+
+export async function deleteCompany(companyId: string) {
+  await requireUser("ADMIN");
+
+  // Tasks aren't deleted — just unlinked — so task history and completed
+  // work stay intact even after the company record is removed.
+  await prisma.$transaction([
+    prisma.task.updateMany({ where: { companyId }, data: { companyId: null } }),
+    prisma.company.delete({ where: { id: companyId } }),
+  ]);
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/companies");
+}

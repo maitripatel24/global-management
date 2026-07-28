@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { CreateCompanyForm } from "@/components/CreateCompanyForm";
 import { ToggleCompanyActiveButton } from "@/components/ToggleCompanyActiveButton";
+import { DeleteCompanyButton } from "@/components/DeleteCompanyButton";
 import { dueUrgency } from "@/lib/dueDate";
 import { IconInbox } from "@/components/icons";
 
@@ -33,6 +34,7 @@ export default async function AdminCompaniesPage() {
                 <th className="px-4 py-2">Open tasks</th>
                 <th className="px-4 py-2">Overdue</th>
                 <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -60,12 +62,15 @@ export default async function AdminCompaniesPage() {
                     <td className="px-4 py-3">
                       <ToggleCompanyActiveButton companyId={c.id} active={c.active} />
                     </td>
+                    <td className="px-4 py-3">
+                      <DeleteCompanyButton companyId={c.id} companyName={c.name} openTaskCount={c.tasks.length} />
+                    </td>
                   </tr>
                 );
               })}
               {companies.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-slate-400">
                     <div className="flex flex-col items-center gap-2">
                       <IconInbox className="h-6 w-6 text-slate-300" />
                       No companies yet. Add your first one above.

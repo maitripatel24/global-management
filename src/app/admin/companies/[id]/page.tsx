@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { CreateTaskForm } from "@/components/CreateTaskForm";
+import { DeleteCompanyButton } from "@/components/DeleteCompanyButton";
 import { IconPaperclip } from "@/components/icons";
 import { dueUrgency, dueUrgencyStyles } from "@/lib/dueDate";
 
@@ -44,17 +45,25 @@ export default async function AdminCompanyDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/admin/companies" className="text-xs text-slate-500 hover:text-slate-800">
-          &larr; All companies
-        </Link>
-        <h1 className="mt-1 text-xl font-semibold text-slate-900">
-          {company.name} {company.code && <span className="text-sm font-normal text-slate-400">({company.code})</span>}
-        </h1>
-        <p className="text-sm text-slate-500">
-          {openCount} open task{openCount === 1 ? "" : "s"}
-          {overdueCount > 0 && <span className="ml-2 font-medium text-red-600">{overdueCount} overdue</span>}
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <Link href="/admin/companies" className="text-xs text-slate-500 hover:text-slate-800">
+            &larr; All companies
+          </Link>
+          <h1 className="mt-1 text-xl font-semibold text-slate-900">
+            {company.name} {company.code && <span className="text-sm font-normal text-slate-400">({company.code})</span>}
+          </h1>
+          <p className="text-sm text-slate-500">
+            {openCount} open task{openCount === 1 ? "" : "s"}
+            {overdueCount > 0 && <span className="ml-2 font-medium text-red-600">{overdueCount} overdue</span>}
+          </p>
+        </div>
+        <DeleteCompanyButton
+          companyId={company.id}
+          companyName={company.name}
+          openTaskCount={company.tasks.length}
+          redirectTo="/admin/companies"
+        />
       </div>
 
       <div className="rounded-lg border border-slate-200 bg-white p-6">
