@@ -48,7 +48,7 @@ export default async function AdminUsersPage() {
                   {u.id === currentUser.id ? (
                     <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
                   ) : (
-                    <ToggleUserActiveButton userId={u.id} active={u.active} />
+                    <ToggleUserActiveButton userId={u.id} userName={u.name} active={u.active} />
                   )}
                 </td>
               </tr>
