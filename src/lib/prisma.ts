@@ -17,6 +17,7 @@ function resolveDatasourceUrl(): string | undefined {
     if (url.port === "6543" && !url.searchParams.has("pgbouncer")) {
       url.searchParams.set("pgbouncer", "true");
     }
+    console.log("[db-diag] using SUPA_POSTGRES_URL", { host: url.hostname, port: url.port, user: url.username, database: url.pathname });
     return url.toString();
   } catch {
     return raw;
