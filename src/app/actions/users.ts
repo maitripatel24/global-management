@@ -4,8 +4,6 @@ import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
-import { sendMail } from "@/lib/mailer";
-import { getBaseUrl } from "@/lib/baseUrl";
 
 export type CreateUserState = { error?: string; success?: boolean } | undefined;
 
@@ -51,29 +49,42 @@ export async function createUser(_prevState: CreateUserState, formData: FormData
   return { success: true };
 }
 
-export type ApproveUserState = { error?: string; success?: boolean; alreadyActive?: boolean };
+export type PendingActionResult = { error?: string; success?: boolean };
 
-// Approves a self-signed-up employee. Requires a signed-in admin, so an email
-// link alone can never approve anyone.
-export async function approveUser(userId: string): Promise<ApproveUserState> {
-  const admin = await requireUser("ADMIN");
+// Approves an employee who signed up themselves. Only works on accounts still
+// marked pending, and only for a signed-in admin.
+export async function approveUser(userId: string): Promise<PendingActionResult> {
+  await requireUser("ADMIN");
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) return { error: "Account not found." };
-  if (user.role !== "EMPLOYEE") return { error: "Only employee accounts can be approved here." };
-  if (user.active) return { success: true, alreadyActive: true };
+  if (!user || !user.pendingApproval || user.role !== "EMPLOYEE") {
+    return { error: "This request is no longer pending." };
+  }
 
-  await prisma.user.update({ where: { id: userId }, data: { active: true } });
-
-  const base = await getBaseUrl();
-  await sendMail(
-    user.email,
-    "Your Office Manager account is approved",
-    `Hi ${user.name},\n\nYour account has been approved by ${admin.name}. You can now sign in here:\n${base}/login\n`,
-  );
+  await prisma.user.update({ where: { id: userId }, data: { active: true, pendingApproval: false } });
 
   revalidatePath("/admin/users");
-  revalidatePath(`/admin/approve/${userId}`);
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+// Rejects a sign-up request by deleting the never-activated account.
+export async function rejectUser(userId: string): Promise<PendingActionResult> {
+  await requireUser("ADMIN");
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || !user.pendingApproval || user.role !== "EMPLOYEE") {
+    return { error: "This request is no longer pending." };
+  }
+
+  try {
+    await prisma.user.delete({ where: { id: userId } });
+  } catch {
+    return { error: "Couldn't remove this request. Please try again." };
+  }
+
+  revalidatePath("/admin/users");
+  revalidatePath("/admin");
   return { success: true };
 }
 

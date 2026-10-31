@@ -21,7 +21,7 @@ export default async function AdminDashboard() {
   const user = await requireUser("ADMIN");
   const date = todayStart();
 
-  const [employees, tasks, todaysUpdates, recentUpdates, companyCount] = await Promise.all([
+  const [employees, tasks, todaysUpdates, recentUpdates, companyCount, pendingApprovals] = await Promise.all([
     prisma.user.findMany({ where: { role: "EMPLOYEE", active: true } }),
     prisma.task.findMany(),
     prisma.dailyUpdate.count({ where: { date } }),
@@ -31,6 +31,7 @@ export default async function AdminDashboard() {
       include: { user: true },
     }),
     prisma.company.count(),
+    prisma.user.count({ where: { pendingApproval: true } }),
   ]);
 
   const statusCounts = {
@@ -46,6 +47,21 @@ export default async function AdminDashboard() {
         <h1 className="text-xl font-semibold text-slate-900">Welcome back, {user.name}</h1>
         <p className="text-sm text-slate-500">Here&apos;s how the team is doing today.</p>
       </div>
+
+      {pendingApprovals > 0 && (
+        <Link
+          href="/admin/users"
+          className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm transition-colors hover:bg-amber-100"
+        >
+          <span className="font-medium text-amber-900">
+            {pendingApprovals} new employee {pendingApprovals === 1 ? "account is" : "accounts are"} waiting for your
+            approval
+          </span>
+          <span className="flex items-center gap-1 font-semibold text-amber-900">
+            Review <IconArrowRight className="h-4 w-4" />
+          </span>
+        </Link>
+      )}
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         <StatCard label="Companies" value={companyCount} icon={<IconBuilding />} color="slate" href="/admin/companies" />

@@ -7,8 +7,6 @@ import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { withDbRetry } from "@/lib/retry";
 import { notifyAdmins } from "@/lib/notify";
-import { sendMail } from "@/lib/mailer";
-import { getBaseUrl } from "@/lib/baseUrl";
 
 export type LoginState = { error?: string } | undefined;
 export type SignUpState = { error?: string; success?: boolean } | undefined;
@@ -119,47 +117,27 @@ export async function signUp(_prevState: SignUpState, formData: FormData): Promi
     return { error: "An account with this email or phone number already exists. Try signing in, or contact your admin." };
   }
 
-  let created: { id: string };
   try {
-    created = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name,
         email,
         phone,
         role: "EMPLOYEE",
         active: false,
+        pendingApproval: true,
         passwordHash: await bcrypt.hash(password, 10),
       },
-      select: { id: true },
     });
   } catch {
     return { error: "An account with this email or phone number already exists. Try signing in, or contact your admin." };
   }
 
-  const approvePath = `/admin/approve/${created.id}`;
-
-  // None of the notifications below may fail the sign-up: the account exists
-  // either way and still shows up in Admin > Users.
+  // The bell notification must never fail the sign-up: the account exists
+  // either way and shows up under "Pending approvals" for admins.
   try {
-    await notifyAdmins(`${name} signed up and is waiting for your approval.`, approvePath);
+    await notifyAdmins(`${name} signed up and is waiting for your approval.`, "/admin/users");
   } catch {}
-
-  // Approval email. The link only works for a signed-in admin, so having the
-  // email alone is not enough to approve anyone.
-  const approver = process.env.SIGNUP_APPROVAL_EMAIL;
-  if (approver) {
-    try {
-      const base = await getBaseUrl();
-      await sendMail(
-        approver,
-        `New sign-up waiting for approval: ${name}`,
-        `${name} has signed up for Office Manager and is waiting for your approval.\n\n` +
-          `Email: ${email}\nPhone: ${phone}\n\n` +
-          `To approve, open this link and sign in as an admin:\n${base}${approvePath}\n\n` +
-          `If you don't recognise this person, ignore this email. The account stays switched off.`,
-      );
-    } catch {}
-  }
 
   return { success: true };
 }

@@ -28,6 +28,7 @@ CREATE TABLE "User" (
     "passwordHash" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'EMPLOYEE',
     "active" BOOLEAN NOT NULL DEFAULT true,
+    "pendingApproval" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
