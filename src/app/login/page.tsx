@@ -1,14 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useActionState, useState } from "react";
 import { login } from "@/app/actions/auth";
 import { Logo } from "@/components/Logo";
 import { IconEye, IconEyeOff } from "@/components/icons";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const [state, formAction, pending] = useActionState(login, undefined);
   const [showPassword, setShowPassword] = useState(false);
+  // Set by the page protection when someone opens a link (e.g. from an email)
+  // while signed out, so they land back on it after signing in.
+  const callbackUrl = useSearchParams().get("callbackUrl") ?? "";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
@@ -20,6 +32,7 @@ export default function LoginPage() {
         <p className="mt-1 text-sm text-slate-500">Sign in to your account</p>
 
         <form action={formAction} className="mt-6 space-y-4">
+          <input type="hidden" name="callbackUrl" value={callbackUrl} />
           <div>
             <label htmlFor="identifier" className="block text-sm font-medium text-slate-700">
               Email or Phone

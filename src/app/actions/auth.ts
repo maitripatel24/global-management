@@ -7,6 +7,8 @@ import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { withDbRetry } from "@/lib/retry";
 import { notifyAdmins } from "@/lib/notify";
+import { sendMail } from "@/lib/mailer";
+import { getBaseUrl } from "@/lib/baseUrl";
 
 export type LoginState = { error?: string } | undefined;
 export type SignUpState = { error?: string; success?: boolean } | undefined;
@@ -27,9 +29,24 @@ async function isDisabledAccountWithValidPassword(identifier: string, password: 
   }
 }
 
+// Where to send someone after signing in. Only the path of the requested page
+// is used (never its host), and only inside the area their role may open, so
+// a crafted link can't redirect people to another site.
+function pickDestination(raw: string | null, role?: string) {
+  const area = role === "ADMIN" ? "/admin" : "/employee";
+  if (!raw) return area;
+  try {
+    const url = new URL(raw, "http://local");
+    const path = url.pathname + url.search;
+    if (url.pathname === area || url.pathname.startsWith(`${area}/`)) return path;
+  } catch {}
+  return area;
+}
+
 export async function login(_prevState: LoginState, formData: FormData) {
   const identifier = (formData.get("identifier") as string)?.trim();
   const password = formData.get("password") as string;
+  const callbackUrl = (formData.get("callbackUrl") as string) || null;
 
   try {
     await signIn("credentials", { identifier, password, redirect: false });
@@ -61,7 +78,7 @@ export async function login(_prevState: LoginState, formData: FormData) {
       ? prisma.user.findUnique({ where: { email: identifier.toLowerCase() }, select: { role: true } })
       : prisma.user.findUnique({ where: { phone: identifier.replace(/\D/g, "") }, select: { role: true } }),
   );
-  redirect(user?.role === "ADMIN" ? "/admin" : "/employee");
+  redirect(pickDestination(callbackUrl, user?.role));
 }
 
 // Public employee sign-up. Always creates an EMPLOYEE (never an admin) and
@@ -102,8 +119,9 @@ export async function signUp(_prevState: SignUpState, formData: FormData): Promi
     return { error: "An account with this email or phone number already exists. Try signing in, or contact your admin." };
   }
 
+  let created: { id: string };
   try {
-    await prisma.user.create({
+    created = await prisma.user.create({
       data: {
         name,
         email,
@@ -112,15 +130,35 @@ export async function signUp(_prevState: SignUpState, formData: FormData): Promi
         active: false,
         passwordHash: await bcrypt.hash(password, 10),
       },
+      select: { id: true },
     });
   } catch {
     return { error: "An account with this email or phone number already exists. Try signing in, or contact your admin." };
   }
 
+  const approvePath = `/admin/approve/${created.id}`;
+
+  // None of the notifications below may fail the sign-up: the account exists
+  // either way and still shows up in Admin > Users.
   try {
-    await notifyAdmins(`${name} signed up and is waiting for your approval.`, "/admin/users");
-  } catch {
-    // The account exists either way; admins will still see it in the Users list.
+    await notifyAdmins(`${name} signed up and is waiting for your approval.`, approvePath);
+  } catch {}
+
+  // Approval email. The link only works for a signed-in admin, so having the
+  // email alone is not enough to approve anyone.
+  const approver = process.env.SIGNUP_APPROVAL_EMAIL;
+  if (approver) {
+    try {
+      const base = await getBaseUrl();
+      await sendMail(
+        approver,
+        `New sign-up waiting for approval: ${name}`,
+        `${name} has signed up for Office Manager and is waiting for your approval.\n\n` +
+          `Email: ${email}\nPhone: ${phone}\n\n` +
+          `To approve, open this link and sign in as an admin:\n${base}${approvePath}\n\n` +
+          `If you don't recognise this person, ignore this email. The account stays switched off.`,
+      );
+    } catch {}
   }
 
   return { success: true };
