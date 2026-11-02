@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { CreateSelfTaskForm } from "@/components/CreateSelfTaskForm";
 import { StatusBadge } from "@/components/StatusBadge";
 import { IconPaperclip, IconUsers, IconClock, IconInbox } from "@/components/icons";
 import { dueUrgency, dueUrgencyStyles } from "@/lib/dueDate";
@@ -15,19 +14,16 @@ export default async function EmployeeCompanyDetailPage({
   const { id } = await params;
   const user = await requireUser("EMPLOYEE");
 
-  const [company, companies] = await Promise.all([
-    prisma.company.findUnique({
-      where: { id },
-      include: {
-        tasks: {
-          where: { assignedToId: user.id },
-          orderBy: [{ status: "asc" }, { dueDate: "asc" }],
-          include: { assignedBy: true, _count: { select: { attachments: true } } },
-        },
+  const company = await prisma.company.findUnique({
+    where: { id },
+    include: {
+      tasks: {
+        where: { assignedToId: user.id },
+        orderBy: [{ status: "asc" }, { dueDate: "asc" }],
+        include: { assignedBy: true, _count: { select: { attachments: true } } },
       },
-    }),
-    prisma.company.findMany({ where: { active: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
-  ]);
+    },
+  });
 
   if (!company) {
     notFound();
@@ -45,15 +41,11 @@ export default async function EmployeeCompanyDetailPage({
         <p className="mt-1 text-base text-slate-500">Your tasks for this company</p>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">Create a task for yourself</h2>
-        <CreateSelfTaskForm companies={companies} defaultCompanyId={company.id} />
-      </div>
-
       {company.tasks.length === 0 && (
         <div className="flex flex-col items-center gap-2 rounded-lg border border-slate-200 bg-white py-14 text-center text-base text-slate-400">
           <IconInbox className="h-8 w-8 text-slate-300" />
           You have no tasks for this company yet.
+          <span className="text-sm">Your admin assigns tasks to you.</span>
         </div>
       )}
 
