@@ -88,6 +88,21 @@ export async function rejectUser(userId: string): Promise<PendingActionResult> {
   return { success: true };
 }
 
+// Lets an admin set a new password for someone who forgot theirs. Admins change
+// their own password from the Account page instead.
+export async function resetUserPassword(userId: string, newPassword: string): Promise<PendingActionResult> {
+  const admin = await requireUser("ADMIN");
+
+  if (userId === admin.id) return { error: "Use the Account page to change your own password." };
+  if (!newPassword || newPassword.length < 8) return { error: "Password must be at least 8 characters." };
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+  if (!user) return { error: "Account not found." };
+
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash: await bcrypt.hash(newPassword, 10) } });
+  return { success: true };
+}
+
 export async function setUserActive(userId: string, active: boolean) {
   await requireUser("ADMIN");
   await prisma.user.update({ where: { id: userId }, data: { active } });

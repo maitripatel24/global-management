@@ -22,6 +22,7 @@ const iconFor = (label: string) => {
   const key = label.toLowerCase();
   if (key.includes("dashboard")) return IconDashboard;
   if (key.includes("compan")) return IconBuilding;
+  if (key.includes("account")) return IconUsers;
   if (key.includes("employee") || key.includes("user")) return IconUsers;
   if (key.includes("chat")) return IconChat;
   if (key.includes("task")) return IconTasks;
@@ -75,10 +76,12 @@ export function MobileNav({
   links,
   userName,
   size = "md",
+  accountHref,
 }: {
   links: { href: string; label: string }[];
   userName: string;
   size?: "md" | "lg";
+  accountHref?: string;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -116,7 +119,13 @@ export function MobileNav({
             })}
           </nav>
           <div className="flex items-center justify-between border-t border-slate-100 px-3 py-3">
-            <span className="text-sm text-slate-500">{userName}</span>
+            {accountHref ? (
+              <Link href={accountHref} onClick={() => setOpen(false)} className="text-sm font-medium text-slate-700 underline">
+                {userName} · Account
+              </Link>
+            ) : (
+              <span className="text-sm text-slate-500">{userName}</span>
+            )}
             <form action={logout}>
               <button
                 type="submit"

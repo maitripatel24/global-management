@@ -19,12 +19,14 @@ export function TopNav({
   links,
   notifications,
   size = "md",
+  accountHref,
 }: {
   title: string;
   userName: string;
   links: { href: string; label: string }[];
   notifications: NotificationItem[];
   size?: "md" | "lg";
+  accountHref?: string;
 }) {
   const large = size === "lg";
 
@@ -32,7 +34,7 @@ export function TopNav({
     <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
         <div className="flex min-w-0 items-center gap-2 sm:gap-6">
-          <MobileNav links={links} userName={userName} size={size} />
+          <MobileNav links={links} userName={userName} size={size} accountHref={accountHref} />
           <Link
             href={links[0]?.href ?? "/"}
             className={`flex min-w-0 items-center gap-1.5 truncate font-semibold text-slate-900 hover:text-slate-700 ${large ? "text-base" : "text-sm"}`}
@@ -44,7 +46,17 @@ export function TopNav({
         </div>
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <NotificationBell notifications={notifications} />
-          <span className="hidden text-sm text-slate-500 lg:inline">{userName}</span>
+          {accountHref ? (
+            <Link
+              href={accountHref}
+              title="My account and password"
+              className="hidden text-sm text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline lg:inline"
+            >
+              {userName}
+            </Link>
+          ) : (
+            <span className="hidden text-sm text-slate-500 lg:inline">{userName}</span>
+          )}
           <form action={logout}>
             <button
               type="submit"

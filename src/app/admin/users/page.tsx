@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { CreateUserForm } from "@/components/CreateUserForm";
 import { ToggleUserActiveButton } from "@/components/ToggleUserActiveButton";
 import { PendingApprovalActions } from "@/components/PendingApprovalActions";
+import { ResetPasswordButton } from "@/components/ResetPasswordButton";
 
 export default async function AdminUsersPage() {
   const currentUser = await requireUser("ADMIN");
@@ -59,6 +60,7 @@ export default async function AdminUsersPage() {
               <th className="px-4 py-2">Phone</th>
               <th className="px-4 py-2">Role</th>
               <th className="px-4 py-2">Status</th>
+              <th className="px-4 py-2">Password</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -83,6 +85,13 @@ export default async function AdminUsersPage() {
                     </span>
                   ) : (
                     <ToggleUserActiveButton userId={u.id} userName={u.name} active={u.active} />
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  {u.id === currentUser.id ? (
+                    <span className="text-xs text-slate-400">Use Account page</span>
+                  ) : (
+                    <ResetPasswordButton userId={u.id} userName={u.name} />
                   )}
                 </td>
               </tr>

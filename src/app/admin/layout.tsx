@@ -17,6 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         title="Office Manager · Admin"
         userName={user.name ?? ""}
         notifications={notifications}
+        accountHref="/admin/account"
         links={[
           { href: "/admin", label: "Dashboard" },
           { href: "/admin/companies", label: "Companies" },
