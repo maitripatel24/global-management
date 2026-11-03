@@ -47,7 +47,7 @@ export default async function EmployeeCompanyDetailPage({
 
       <div className="rounded-lg border border-slate-200 bg-white p-6">
         <h2 className="mb-4 text-lg font-semibold text-slate-800">Create a task for yourself</h2>
-        <CreateSelfTaskForm companies={companies} defaultCompanyId={company.id} />
+        <CreateSelfTaskForm companies={companies} />
       </div>
 
       {company.tasks.length === 0 && (

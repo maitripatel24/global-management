@@ -7,13 +7,7 @@ import { IconPlus } from "@/components/icons";
 
 type CompanyOption = { id: string; name: string };
 
-export function CreateSelfTaskForm({
-  companies,
-  defaultCompanyId,
-}: {
-  companies?: CompanyOption[];
-  defaultCompanyId?: string;
-}) {
+export function CreateSelfTaskForm({ companies }: { companies?: CompanyOption[] }) {
   const [state, formAction, isPending] = useActionState(createSelfTask, undefined);
   const showToast = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -51,7 +45,7 @@ export function CreateSelfTaskForm({
           <label className="block text-sm font-semibold text-slate-700">Company</label>
           <select
             name="companyId"
-            defaultValue={defaultCompanyId ?? ""}
+            defaultValue=""
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2.5 text-base transition-colors focus:border-slate-500 focus:outline-none"
           >
             <option value="">No company</option>
